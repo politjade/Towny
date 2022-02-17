@@ -89,6 +89,10 @@
             <id>central</id>
             <url>https://repo1.maven.org/maven2</url>
         </repository>
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -192,6 +196,12 @@
             <groupId>com.github.bsideup.jabel</groupId>
             <artifactId>jabel-javac-plugin</artifactId>
             <version>0.4.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.lokka30</groupId>
+            <artifactId>treasury-api</artifactId>
+            <version>1.1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

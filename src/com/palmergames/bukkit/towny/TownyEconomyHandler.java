@@ -34,7 +34,7 @@ public class TownyEconomyHandler {
 	private static String version = "";
 	
 	public enum EcoType {
-		NONE, VAULT, RESERVE
+		NONE, VAULT, RESERVE, TREASURY
 	}
 	
 	public static String getServerAccount() {
@@ -115,6 +115,16 @@ public class TownyEconomyHandler {
 			setVersion(String.format("%s %s", ((Reserve) economyProvider).economy().name(), "via Reserve" ));
 			Type = EcoType.RESERVE;
 			return true;
+		}
+
+		/*
+		 * Attempt to find Treasury for Economy handling
+		 */
+		economyProvider = plugin.getServer().getPluginManager().getPlugin("Treasury");
+		if (economyProvider != null) {
+			Type = EcoType.TREASURY;
+			return true;
+				
 		}
 
 		/*
