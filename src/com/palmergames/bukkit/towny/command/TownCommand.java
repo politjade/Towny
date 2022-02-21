@@ -88,6 +88,7 @@ import com.palmergames.bukkit.towny.utils.ResidentUtil;
 import com.palmergames.bukkit.towny.utils.SpawnUtil;
 import com.palmergames.bukkit.towny.utils.TownRuinUtil;
 import com.palmergames.bukkit.towny.utils.TownUtil;
+import com.palmergames.bukkit.towny.utils.TownyComponents;
 import com.palmergames.bukkit.util.BookFactory;
 import com.palmergames.bukkit.util.BukkitTools;
 import com.palmergames.bukkit.util.ChatTools;
@@ -122,6 +123,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -1319,7 +1321,7 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 			return;
 		}
 
-		List<String> out = new ArrayList<>();
+		List<Component> out = new ArrayList<>();
 
 		int townOwned = 0;
 		int resident = 0;
@@ -1331,36 +1333,28 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		int shop = 0;
 		int shopRO = 0;
 		int shopFS = 0;
-		int farm = 0;
-		int arena = 0;
-		int wilds = 0;
-		int jail = 0;
-		int inn = 0;
+		
+		final HashMap<TownBlockType, Integer> townBlockTypeCounts = new HashMap<>();
+		
 		for (TownBlock townBlock : town.getTownBlocks()) {
+			TownBlockType type = townBlock.getType();
 
-			if (townBlock.getType() == TownBlockType.EMBASSY) {
+			if (type != TownBlockType.EMBASSY && type != TownBlockType.COMMERCIAL && type != TownBlockType.RESIDENTIAL)
+				townBlockTypeCounts.merge(type, 1, Integer::sum);
+
+			if (type == TownBlockType.EMBASSY) {
 				embassy++;
 				if (townBlock.hasResident())
 					embassyRO++;
 				if (townBlock.isForSale())
 					embassyFS++;
-			} else if (townBlock.getType() == TownBlockType.COMMERCIAL) {
+			} else if (type == TownBlockType.COMMERCIAL) {
 				shop++;
 				if (townBlock.hasResident())
 					shopRO++;
 				if (townBlock.isForSale())
 					shopFS++;
-			} else if (townBlock.getType() == TownBlockType.FARM) {
-				farm++;
-			} else if (townBlock.getType() == TownBlockType.ARENA) {
-				arena++;
-			} else if (townBlock.getType() == TownBlockType.WILDS) {
-				wilds++;
-			} else if (townBlock.getType() == TownBlockType.JAIL) {
-				jail++;
-			} else if (townBlock.getType() == TownBlockType.INN) {
-				inn++;
-			} else if (townBlock.getType() == TownBlockType.RESIDENTIAL) {
+			} else if (type == TownBlockType.RESIDENTIAL) {
 				resident++;
 				if (townBlock.hasResident())
 					residentOwned++;
@@ -1372,30 +1366,33 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 			}
 		}
 		out.add(ChatTools.formatTitle(town + " Town Plots"));
-		out.add(Colors.Green + "Town Size: " + Colors.LightGreen + town.getTownBlocks().size() + " / " + town.getMaxTownBlocksAsAString() 
-			+ (!town.hasUnlimitedClaims() 
-				? (TownySettings.isSellingBonusBlocks(town) 
-						? Colors.LightBlue + " [Bought: " + town.getPurchasedBlocks() + "/" + TownySettings.getMaxPurchasedBlocks(town) + "]" 
-						: "") 
-					+ (town.getBonusBlocks() > 0 
-						? Colors.LightBlue + " [Bonus: " + town.getBonusBlocks() + "]" 
-						: "") 
-					+ (TownySettings.getNationBonusBlocks(town) > 0 
-						? Colors.LightBlue + " [NationBonus: " + TownySettings.getNationBonusBlocks(town) + "]" 
-						: "")
-				: ""));
 		
-		out.add(Colors.Green + "Town Owned Land: " + Colors.LightGreen + townOwned);
-		out.add(Colors.Green + "Farms   : " + Colors.LightGreen + farm);
-		out.add(Colors.Green + "Arenas : " + Colors.LightGreen + arena);
-		out.add(Colors.Green + "Wilds    : " + Colors.LightGreen + wilds);
-		out.add(Colors.Green + "Jails    : " + Colors.LightGreen + jail);
-		out.add(Colors.Green + "Inns    : " + Colors.LightGreen + inn);
-		out.add(Colors.Green + "Type: " + Colors.LightGreen + "Player-Owned / ForSale / Total / Daily Revenue");
-		out.add(Colors.Green + "Residential: " + Colors.LightGreen + residentOwned + " / " + residentOwnedFS + " / " + resident + " / " + (residentOwned * town.getPlotTax()));
-		out.add(Colors.Green + "Embassies : " + Colors.LightGreen + embassyRO + " / " + embassyFS + " / " + embassy + " / " + (embassyRO * town.getEmbassyPlotTax()));
-		out.add(Colors.Green + "Shops      : " + Colors.LightGreen + shopRO + " / " + shopFS + " / " + shop + " / " + (shop * town.getCommercialPlotTax()));
-		out.add(Translatable.of("msg_town_plots_revenue_disclaimer").forLocale(player));
+		//TODO: test this with unlimited town claims
+		out.add(Component.text("Town Size: ", NamedTextColor.DARK_GREEN)
+			.append(Component.text(town.getTownBlocks().size() + " / " + town.getMaxTownBlocksAsAString(), NamedTextColor.GREEN))
+			.append(town.hasUnlimitedClaims() ?
+				TownySettings.isSellingBonusBlocks(town) ?
+					Component.text(" [Bought: " + town.getPurchasedBlocks() + "/" + TownySettings.getMaxPurchasedBlocks(town) + "]", NamedTextColor.AQUA) : 
+					Component.empty()
+				.append(town.getBonusBlocks() > 0 ?
+					Component.text(" [Bonus: " + town.getBonusBlocks() + "]", NamedTextColor.AQUA) :
+					Component.empty()) 
+				.append(TownySettings.getNationBonusBlocks(town) > 0 ?
+					Component.text(" [NationBonus: " + TownySettings.getNationBonusBlocks(town) + "]", NamedTextColor.AQUA) :
+					Component.empty())
+				: Component.empty()));
+		
+		out.add(Component.text("Town Owned Land: ", NamedTextColor.DARK_GREEN).append(Component.text(townOwned, NamedTextColor.GREEN)));
+
+		for (TownBlockType type : townBlockTypeCounts.keySet())
+			out.add(Component.text(type.getFormattedName() + ": ", NamedTextColor.GREEN).append(Component.text(townBlockTypeCounts.get(type), NamedTextColor.GREEN)));
+		
+		out.add(Component.text("Type: ", NamedTextColor.DARK_GREEN).append(Component.text("Player-Owned / ForSale / Total / Daily Revenue", NamedTextColor.GREEN)));
+		out.add(Component.text("Residential: ", NamedTextColor.DARK_GREEN).append(Component.text(residentOwned + " / " + residentOwnedFS + " / " + resident + " / " + (residentOwned * town.getPlotTax()), NamedTextColor.GREEN)));
+		out.add(Component.text("Embassies: ", NamedTextColor.DARK_GREEN).append(Component.text(embassyRO + " / " + embassyFS + " / " + embassy + " / " + (embassyRO * town.getEmbassyPlotTax()), NamedTextColor.GREEN)));
+		out.add(Component.text("Shops: ", NamedTextColor.DARK_GREEN).append(Component.text(shopRO + " / " + shopFS + " / " + shop + " / " + (shop * town.getCommercialPlotTax()), NamedTextColor.GREEN)));
+		out.add(Translatable.of("msg_town_plots_revenue_disclaimer").componentFor(player));
+
 		TownyMessaging.sendMessage(sender, out);
 
 	}
