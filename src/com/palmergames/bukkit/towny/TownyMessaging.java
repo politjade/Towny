@@ -88,7 +88,7 @@ public class TownyMessaging {
 		if (sender != null) {
 			CommandSender toSend = (CommandSender) sender;
 			if (toSend instanceof ConsoleCommandSender) {
-				toSend.sendMessage(Translatable.of("default_towny_prefix").stripColors(true).defaultLocale() + ChatColor.stripColor(msg));
+				toSend.sendMessage(Translatable.of("default_towny_prefix").stripColors(true).defaultLocale() + Colors.strip(msg));
 			} else {
 				toSend.sendMessage(Translation.of("default_towny_prefix") + ChatColor.RED + msg);
 			}
@@ -143,7 +143,7 @@ public class TownyMessaging {
 		if (sender instanceof Player p) {
 			p.sendMessage(Translatable.of("default_towny_prefix").forLocale(p) + ChatColor.GREEN + msg);
 		} else if (sender instanceof ConsoleCommandSender) {
-			sender.sendMessage(Translatable.of("default_towny_prefix").stripColors(true).defaultLocale() + ChatColor.stripColor(msg));
+			sender.sendMessage(Translatable.of("default_towny_prefix").stripColors(true).defaultLocale() + Colors.strip(msg));
 		} else {
 			sender.sendMessage(Translatable.of("default_towny_prefix").forLocale(sender) + ChatColor.GREEN + msg);
 		}
@@ -647,9 +647,9 @@ public class TownyMessaging {
 			String spawnCost = "Free";
 
 			if (TownyEconomyHandler.isActive())
-				spawnCost = ChatColor.RESET + Translation.of("msg_spawn_cost", TownyEconomyHandler.getFormattedBalance(town.getSpawnCost()));
+				spawnCost = Translation.of("msg_spawn_cost", TownyEconomyHandler.getFormattedBalance(town.getSpawnCost()));
 
-			line = line.hoverEvent(HoverEvent.showText(TownyComponents.miniMessage(Colors.GOLD + Translatable.of("msg_click_spawn", name.equalsIgnoreCase("") ? "outpost" : name).forLocale(player) + "\n" + spawnCost)));
+			line = line.hoverEvent(HoverEvent.showText(TownyComponents.miniMessage(Translatable.of("msg_click_spawn", name.equalsIgnoreCase("") ? "outpost" : name).forLocale(player) + "\n" + spawnCost)));
 			outpostsFormatted[i % 10] = line;
 		}
 		
@@ -676,15 +676,16 @@ public class TownyMessaging {
 		} else {
 			jailsFormatted = new Component[10];
 		}
-		String headerMsg = ChatColor.GOLD + "# " +
-							ChatColor.DARK_GRAY + "- "+
-							ChatColor.GREEN + "Jail Name " +
-							ChatColor.DARK_GRAY + "- "+
-							ChatColor.BLUE + "Coord " +
-							ChatColor.DARK_GRAY + "- " +
-							ChatColor.YELLOW + "Cell Count " +
-							ChatColor.DARK_GRAY + "- " +
-							ChatColor.RED + "Primary Jail";
+		Component headerMsg = Component.text("# ", NamedTextColor.GOLD)
+			.append(Component.text("- ", NamedTextColor.DARK_GRAY))
+			.append(Component.text("Jail Name ", NamedTextColor.GREEN))
+			.append(Component.text("- ", NamedTextColor.DARK_GRAY))
+			.append(Component.text("Coord ", NamedTextColor.BLUE))
+			.append(Component.text("- ", NamedTextColor.DARK_GRAY))
+			.append(Component.text("Cell Count ", NamedTextColor.YELLOW))
+			.append(Component.text("- ", NamedTextColor.DARK_GRAY))
+			.append(Component.text("Primary Jail", NamedTextColor.RED));
+
 		for (int i = (page - 1) * 10; i < iMax; i++) {
 			Jail jail = jails.get(i);
 
@@ -705,7 +706,7 @@ public class TownyMessaging {
 		}
 		Audience audience = Towny.getAdventure().player(player);
 		audience.sendMessage(ChatTools.formatTitle(Translatable.of("jail_plu").forLocale(player)));
-		player.sendMessage(headerMsg);
+		audience.sendMessage(headerMsg);
 		for (Component component : jailsFormatted) {
 			audience.sendMessage(component);
 		}
@@ -727,13 +728,14 @@ public class TownyMessaging {
 			groupsFormatted = new Component[10];
 		}
 		
-		String headerMsg = ChatColor.GOLD + "# " +
-				ChatColor.DARK_GRAY + "- "+
-				ChatColor.GREEN + "Group Name " +
-				ChatColor.DARK_GRAY + "- " +
-				ChatColor.YELLOW + "Plot Size " +
-				ChatColor.DARK_GRAY + "- " +
-				ChatColor.BLUE + "For Sale";
+		Component headerMsg = Component.text("# ", NamedTextColor.GOLD)
+			.append(Component.text("- ", NamedTextColor.DARK_GRAY))
+			.append(Component.text("Group Name ", NamedTextColor.GREEN))
+			.append(Component.text("- ", NamedTextColor.DARK_GRAY))
+			.append(Component.text("Plot Size ", NamedTextColor.YELLOW))
+			.append(Component.text("- ", NamedTextColor.DARK_GRAY))
+			.append(Component.text("For Sale", NamedTextColor.BLUE));
+
 		for (int i = (page - 1) * 10; i < iMax; i++) {
 			PlotGroup group = groups.get(i);
 			Component name = Component.text(group.getFormattedName(), NamedTextColor.GREEN);
@@ -749,7 +751,7 @@ public class TownyMessaging {
 		}
 		Audience audience = Towny.getAdventure().sender(sender);
 		audience.sendMessage(ChatTools.formatTitle(town.getName() + " " + Translatable.of("plotgroup_plu").forLocale(sender)));
-		sender.sendMessage(headerMsg);
+		audience.sendMessage(headerMsg);
 
 		for (Component component : groupsFormatted)
 			audience.sendMessage(component);

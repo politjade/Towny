@@ -1382,9 +1382,9 @@ public class TownCommand extends BaseCommand implements CommandExecutor {
 		out.add(Component.text("Town Owned Land: ", NamedTextColor.DARK_GREEN).append(Component.text(townOwned, NamedTextColor.GREEN)));
 
 		for (TownBlockType type : townBlockTypeCounts.keySet())
-			out.add(Component.text(type.getFormattedName() + ": ", NamedTextColor.GREEN).append(Component.text(townBlockTypeCounts.get(type), NamedTextColor.GREEN)));
+			out.add(Component.text(type.getFormattedName() + ": ", NamedTextColor.DARK_GREEN).append(Component.text(townBlockTypeCounts.get(type), NamedTextColor.GREEN)));
 		
-		out.add(Component.text("Type: ", NamedTextColor.DARK_GREEN).append(Component.text("Player-Owned / ForSale / Total / Daily Revenue", NamedTextColor.GREEN)));
+		out.add(Component.text("Type: ", NamedTextColor.DARK_GREEN).append(Component.text("Player-Owned / For Sale / Total / Daily Revenue", NamedTextColor.GREEN)));
 		out.add(Component.text("Residential: ", NamedTextColor.DARK_GREEN).append(Component.text(residentOwned + " / " + residentOwnedFS + " / " + resident + " / " + (residentOwned * town.getPlotTax()), NamedTextColor.GREEN)));
 		out.add(Component.text("Embassies: ", NamedTextColor.DARK_GREEN).append(Component.text(embassyRO + " / " + embassyFS + " / " + embassy + " / " + (embassyRO * town.getEmbassyPlotTax()), NamedTextColor.GREEN)));
 		out.add(Component.text("Shops: ", NamedTextColor.DARK_GREEN).append(Component.text(shopRO + " / " + shopFS + " / " + shop + " / " + (shop * town.getCommercialPlotTax()), NamedTextColor.GREEN)));
